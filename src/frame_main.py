@@ -23,7 +23,9 @@ class MainFrame(ctk.CTkFrame):
         from test_data import generate_test_data        # REMOVE THIS SHIT! For testing only!
         self.col2 = FlashcardGroupScrollWidget(self, root, generate_test_data(50))
         self.col2.grid(column = 1, row = 0, sticky="nsew", padx=(2,0))
-
+    
+    def load_content(self):
+        self.col2.load_groups()
 
 # Menu frame containing buttons and functionalities for searching
 # and creating new flashcard groups
@@ -94,11 +96,13 @@ class FlashcardGroupScrollWidget(ctk.CTkScrollableFrame):
     def __init__(self, master, root, group_list: List[FlashcardGroup]):
         super().__init__(master)
 
+        self.root = root
         self.items = group_list
+        self.root.after(50, self.load_groups)
 
-        # load items into the widget
+    def load_groups(self):
         for group in self.items:
-            item = FlashcardGroupFrame(self, root, group)
+            item = FlashcardGroupFrame(self, self.root, group)
             item.pack(fill="x", pady=5, padx=1)
 
 
@@ -136,7 +140,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                         font=(self.font_family, self.button_font_size),
                                         command=self.review_window)
         self.review_btn.grid(column=0, row=0, padx=(17,0), pady=15, sticky="W")
-        self.edit_btn = ctk.CTkButton(self, text="Edit",
+        self.edit_btn = ctk.CTkButton(self, text="Manage",
                                       width=self.btn_width, height=self.btn_height,
                                       font=(self.font_family, self.button_font_size),
                                       fg_color="#3A3A3A",

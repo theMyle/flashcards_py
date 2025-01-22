@@ -6,6 +6,7 @@ class ReviewFrame(ctk.CTkFrame):
     def __init__(self, master, group):
         super().__init__(master)
 
+        self.root = master
         self.flashcard_group = group
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -76,4 +77,4 @@ class ReviewFrame(ctk.CTkFrame):
         #TODO
 
     def back_btn_pressed(self):
-        pass
+        self.root.load_main()
