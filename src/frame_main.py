@@ -38,37 +38,45 @@ class NavMenuFrame(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=3)
 
         # search widget
-        self.search_widget = ctk.CTkFrame(self)
+        self.search_widget = self.create_search_widget()
         self.search_widget.grid(column=0, row=0, sticky="EWN", pady=20, padx=10)
-        self.search_widget.grid_columnconfigure(0, weight=1)
-        self.search_widget.grid_rowconfigure(0, weight=1)
-        self.search_widget.grid_rowconfigure(1, weight=1)
-
-        # search bar widget grid and column configurations
-        self.lbl_search_bar = ctk.CTkLabel(self.search_widget, text="Search")
-        self.lbl_search_bar.grid(column=0, row=0, sticky="N", padx=10, pady=(10,0))
-        self.search_bar = ctk.CTkEntry(self.search_widget)
-        self.search_bar.bind("<Return>", self.filter_groups)
-        self.search_bar.grid(column=0, row=1, sticky="EWN", pady=(0, 20), padx=10)
 
         # flashcard group creator widget
-        self.group_creator_widget = ctk.CTkFrame(self)
+        self.group_creator_widget = self.create_group_creator_widget()
         self.group_creator_widget.grid(column=0, row=1, sticky="EWN", pady=20, padx=10)
-        self.group_creator_widget.grid_columnconfigure(0, weight=1)
-        self.group_creator_widget.grid_rowconfigure(0, weight=1)
-        self.group_creator_widget.grid_rowconfigure(1, weight=1)
 
-        # flashcard group creator widget grid and column configs
-        self.lbl_group_creator_name= ctk.CTkLabel(self.group_creator_widget)
-        self.lbl_group_creator_name.grid(column=0, row=1, sticky="W", padx=10, pady=(10,5))
-        self.lbl_group_creator_name.configure(text="Group Name")
-        self.group_name_entry= ctk.CTkEntry(self.group_creator_widget)
-        self.group_name_entry.grid(column=0, row=2, sticky="EWN", pady=(0, 20), padx=10)
-        self.create_btn= ctk.CTkButton(self.group_creator_widget,
+    def create_search_widget(self):
+        search_widget = ctk.CTkFrame(self)
+        search_widget.grid(column=0, row=0, sticky="EWN", pady=20, padx=10)
+        search_widget.grid_columnconfigure(0, weight=1)
+        search_widget.grid_rowconfigure(0, weight=1)
+        search_widget.grid_rowconfigure(1, weight=1)
+
+        lbl_search_bar = ctk.CTkLabel(search_widget, text="Search")
+        lbl_search_bar.grid(column=0, row=0, sticky="N", padx=10, pady=(10,0))
+        self.search_bar = ctk.CTkEntry(search_widget)
+        self.search_bar.bind("<Return>", self.filter_groups)
+        self.search_bar.grid(column=0, row=1, sticky="EWN", pady=(0, 20), padx=10)
+        return search_widget
+
+    def create_group_creator_widget(self):
+        group_creator_widget = ctk.CTkFrame(self)
+        group_creator_widget.grid(column=0, row=1, sticky="EWN", pady=20, padx=10)
+        group_creator_widget.grid_columnconfigure(0, weight=1)
+        group_creator_widget.grid_rowconfigure(0, weight=1)
+        group_creator_widget.grid_rowconfigure(1, weight=1)
+
+        lbl_group_creator_name= ctk.CTkLabel(group_creator_widget)
+        lbl_group_creator_name.grid(column=0, row=1, sticky="W", padx=10, pady=(10,5))
+        lbl_group_creator_name.configure(text="Group Name")
+        group_name_entry= ctk.CTkEntry(group_creator_widget)
+        group_name_entry.grid(column=0, row=2, sticky="EWN", pady=(0, 20), padx=10)
+        create_btn= ctk.CTkButton(group_creator_widget,
                                        text="CREATE NEW SET",
                                        command=self.create_new_flashcard_set,
                                        width=self.btn_width)
-        self.create_btn.grid(column=0, row=99, sticky="N", pady=(0, 20))
+        create_btn.grid(column=0, row=99, sticky="N", pady=(0, 20))
+        return group_creator_widget
 
     def create_new_flashcard_set(self):
         print("Creating a new one")
@@ -102,13 +110,9 @@ class FlashcardGroupFrame(ctk.CTkFrame):
         # members
         self.root = root
         self.flashcard_group = group
-        self.title_label = None
-        self.review_btn = None
-        self.edit_btn = None
-        self.delete_btn = None
+        self.configure(fg_color="#1E1E1E")
 
         # design config
-        self.configure(fg_color="#1E1E1E")
         self.btn_height = 60
         self.btn_width = 100
         self.font_family = "mono"
