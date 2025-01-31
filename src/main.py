@@ -13,7 +13,7 @@ class App(ctk.CTk):
         self.height = 720 
         self.width = 1280
         self.window_x_pos = 50
-        self.window_y_pos = 150
+        self.window_y_pos = 60
         self.minsize(self.width, self.height)
         self.geometry(f"{self.width}x{self.height}+{self.window_y_pos}+{self.window_x_pos}")
 
