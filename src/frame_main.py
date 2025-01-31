@@ -21,7 +21,7 @@ class MainFrame(ctk.CTkFrame):
 
         # Flashcards Group List
         from test_data import generate_test_data        # REMOVE THIS SHIT! For testing only!
-        self.col2 = FlashcardGroupScrollWidget(self, root, generate_test_data(50))
+        self.col2 = FlashcardGroupScrollWidget(self, root, generate_test_data(10))
         self.col2.grid(column = 1, row = 0, sticky="nsew", padx=(2,0))
     
     def load_content(self):
@@ -71,8 +71,8 @@ class NavMenuFrame(ctk.CTkFrame):
         lbl_group_creator_name= ctk.CTkLabel(group_creator_widget)
         lbl_group_creator_name.grid(column=0, row=1, sticky="W", padx=10, pady=(10,5))
         lbl_group_creator_name.configure(text="Group Name")
-        group_name_entry= ctk.CTkEntry(group_creator_widget)
-        group_name_entry.grid(column=0, row=2, sticky="EWN", pady=(0, 20), padx=10)
+        self.group_name_entry= ctk.CTkEntry(group_creator_widget)
+        self.group_name_entry.grid(column=0, row=2, sticky="EWN", pady=(0, 20), padx=10)
         create_btn= ctk.CTkButton(group_creator_widget,
                                        text="CREATE NEW SET",
                                        command=self.create_new_flashcard_set,
@@ -81,8 +81,9 @@ class NavMenuFrame(ctk.CTkFrame):
         return group_creator_widget
 
     def create_new_flashcard_set(self):
-        print("Creating a new one")
-        print("Todo!") # TODO
+        search = self.group_name_entry.get()
+        print(search)
+        print("Create New Group")
 
     # Search Bar (Enter - Pressed)
     def filter_groups(self, event):
@@ -108,12 +109,12 @@ class FlashcardGroupScrollWidget(ctk.CTkScrollableFrame):
 
 # Widget for flashcard group holding the buttons, title and others group information
 class FlashcardGroupFrame(ctk.CTkFrame):
-    def __init__(self, master, root, group: FlashcardGroup):
+    def __init__(self, master, root, group):
         super().__init__(master)
 
         # members
         self.root = root
-        self.flashcard_group = group
+        self.flashcard_group_info = group
         self.configure(fg_color="#1E1E1E")
 
         # design config
@@ -131,7 +132,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=1)
 
         self.title_label = ctk.CTkLabel(self, font=(self.font_family, self.title_font_size),
-                                        text=self.flashcard_group.title,
+                                        text=self.flashcard_group_info.title,
                                         text_color="white",
                                         wraplength=500)
         self.title_label.grid(column=2, row=0, padx=20, sticky="w")
@@ -158,14 +159,15 @@ class FlashcardGroupFrame(ctk.CTkFrame):
 
     # change current window to review window TODO
     def review_window(self):
-        frame = ReviewFrame(self.root, self.flashcard_group)
+        frame = ReviewFrame(self.root, self.flashcard_group_info)
         self.root.change_frame(frame)
     
     # change current window to edit window TODO
     def edit_window(self):
-        frame = EditFrame(self.root)
+        frame = EditFrame(self.root, self.flashcard_group_info)
         self.root.change_frame(frame)
 
     # a deletion pop up for confirmation TODO
     def delete_prompt(self):
+        print("Delete Group")
         pass

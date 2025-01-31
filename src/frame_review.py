@@ -65,14 +65,16 @@ class ReviewFrame(ctk.CTkFrame):
 
     # flip the flashcard
     def flip(self):
+        print("Flip")
         pass
-        #TODO
 
     def correct_btn_pressed(self):
+        print("Correct")
         pass
         #TODO
 
     def wrong_btn_pressed(self):
+        print("Wrong")
         pass
         #TODO
 
