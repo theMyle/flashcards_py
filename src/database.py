@@ -20,8 +20,8 @@ createFlashcardsTable = """
 CREATE TABLE IF NOT EXISTS Flashcards (
     cardId INTEGER PRIMARY KEY AUTOINCREMENT,
     cardFont TEXT NOT NULL,
-    cardBack TEXT NOT NULL
-    groupId INTEGER,        -- Foreign Key Col
+    cardBack TEXT NOT NULL,
+    groupId INTEGER,
     FOREIGN KEY (groupId) 
         REFERENCES FlashcardGroups(groupId) 
         ON DELETE CASCADE
