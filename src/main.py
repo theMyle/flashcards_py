@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from frame_main import MainFrame
-
+import database as db
 
 # Main class for the app
 class App(ctk.CTk):
@@ -13,7 +13,7 @@ class App(ctk.CTk):
         self.height = 720 
         self.width = 1280
         self.window_x_pos = 50
-        self.window_y_pos = 150
+        self.window_y_pos = 60
         self.minsize(self.width, self.height)
         self.geometry(f"{self.width}x{self.height}+{self.window_y_pos}+{self.window_x_pos}")
 
@@ -26,7 +26,7 @@ class App(ctk.CTk):
 
         self.current_window = frame
         self.current_window.pack(fill="both", expand=True)
-    
+
     def load_main(self):
         if self.current_window != None:
             self.current_window.pack_forget()
@@ -41,3 +41,4 @@ if __name__ == "__main__":
     app.load_main()
     app.frame_main.load_content()
     app.mainloop()
+    app.event_add

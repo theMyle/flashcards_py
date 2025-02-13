@@ -7,4 +7,4 @@ if [ ! -d "./venv" ]; then
 fi
 
 echo "Running App..."
-./venv/python3 ./src/main.py
+./venv/bin/python3 ./src/main.py
