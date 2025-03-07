@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from typing import List
 
-from card import FlashcardGroup
+from flashcard import FlashcardGroup
 from frame_edit import EditFrame
 from frame_review import ReviewFrame
 
@@ -12,20 +12,67 @@ class MainFrame(ctk.CTkFrame):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight = 1)
-        self.grid_columnconfigure(1, weight = 5)
+        #self.grid_columnconfigure(1, weight=5)
         self.grid_rowconfigure(0, weight = 1)
+        self.grid_rowconfigure(1, weight = 10)
+
+        # # Orig
+        # # Menu widgets
+        # self.col1 = NavMenuFrame(self)
+        # self.col1.grid(column=0, row=0, sticky="nsew")
+        #
+        # # Flashcards Group List
+        # from test_data import generate_test_data        # REMOVE THIS SHIT! For testing only!
+        # self.col2 = FlashcardGroupScrollWidget(self, root, generate_test_data(10))
+        # self.col2.grid(column = 1, row = 0, sticky="nsew", padx=(2,0))
+        # self.col2.load_groups()
+
 
         # Menu widgets
-        self.col1 = NavMenuFrame(self)
-        self.col1.grid(column=0, row=0, sticky="nsew")
+        self.menu = ctk.CTkFrame(self)
+        self.menu.grid(column=0, row=0, sticky="nsew")
+        self.menu.grid_columnconfigure(0, weight=1)
+        self.menu.grid_columnconfigure(1, weight=11)
+        self.menu.grid_columnconfigure(2, weight=1)
+        self.menu.grid_rowconfigure(0, weight=1)
+
+        self.menu.search_lbl = ctk.CTkLabel(self.menu, text="Search")
+        self.menu.search_bar = ctk.CTkTextbox(self.menu, height=25)
+        self.menu.create_btn = ctk.CTkButton(self.menu, 
+                                             text="Create New", 
+                                             width=100, 
+                                             height=30,
+                                             command=self.create_new_set)
+
+        self.menu.search_lbl.grid(column=0, row=0)
+        self.menu.search_bar.grid(column=1, row=0, sticky="ew")
+        self.menu.search_bar.bind("<Key>", self.search_event_handler)
+        self.menu.create_btn.grid(column=2, row=0)
 
         # Flashcards Group List
         from test_data import generate_test_data        # REMOVE THIS SHIT! For testing only!
-        self.col2 = FlashcardGroupScrollWidget(self, root, generate_test_data(10))
-        self.col2.grid(column = 1, row = 0, sticky="nsew", padx=(2,0))
-    
-    def load_content(self):
-        self.col2.load_groups()
+        self.groupList = FlashcardGroupScrollWidget(self, root, generate_test_data(10))
+        self.groupList.configure(fg_color="transparent")
+        self.groupList.grid(column = 0, row = 1, sticky="nsew")
+        self.groupList.load_groups()
+
+    def create_new_set(self):
+        print("Todo")
+        pass
+
+    def search_event_handler(self, event):
+        text = self.menu.search_bar.get("0.0", "end").strip()
+
+        if event.keysym == "Return":
+            print(f"Todo Search: {text}")
+            return "break"
+
+        elif event.keysym == "BackSpace":
+            print(f"Character deleted")
+
+        elif event.keysym == "Escape":
+            print("Clear")
+
 
 # Menu frame containing buttons and functionalities for searching
 # and creating new flashcard groups
@@ -37,15 +84,16 @@ class NavMenuFrame(ctk.CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=3)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=10)
 
         # search widget
         self.search_widget = self.create_search_widget()
-        self.search_widget.grid(column=0, row=0, sticky="EWN", pady=20, padx=10)
+        self.search_widget.grid(column=0, row=0, sticky="EWN", pady=(10,5), padx=10)
 
         # flashcard group creator widget
         self.group_creator_widget = self.create_group_creator_widget()
-        self.group_creator_widget.grid(column=0, row=1, sticky="EWN", pady=20, padx=10)
+        self.group_creator_widget.grid(column=0, row=1, sticky="EWN", pady=(5,10), padx=10)
 
     def create_search_widget(self):
         search_widget = ctk.CTkFrame(self)
@@ -99,7 +147,7 @@ class FlashcardGroupScrollWidget(ctk.CTkScrollableFrame):
 
         self.root = root
         self.items = group_list
-        self.root.after(50, self.load_groups)
+        # self.root.after(50, self.load_groups)
 
     def load_groups(self):
         for group in self.items:
@@ -161,7 +209,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
     def review_window(self):
         frame = ReviewFrame(self.root, self.flashcard_group_info)
         self.root.change_frame(frame)
-    
+
     # change current window to edit window TODO
     def edit_window(self):
         frame = EditFrame(self.root, self.flashcard_group_info)
