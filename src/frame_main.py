@@ -48,10 +48,17 @@ class MainFrame(ctk.CTkFrame):
     # creates a new set, inserts to database and updates the UI too
     def create_new_set(self):
         dialog = ctk.CTkInputDialog(text="Enter Group Name", title="Create New Flashcard Group")
+        sw = dialog.winfo_screenwidth()
+        sh = dialog.winfo_screenheight()
+
+        w = dialog.winfo_width()
+        h = dialog.winfo_height()
+
+        dialog.geometry(f"+{(sw - w) // 2}+{(sh-h) // 2}")
 
         groupName = dialog.get_input()
-        if len(groupName) == 0:
-            return
+        if groupName == None:
+            return 
         else:
             groupName.strip()
 

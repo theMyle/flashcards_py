@@ -26,6 +26,12 @@ class PopupWindow(ctk.CTkToplevel):
     def __init__(self, parent, operation, cardInfo: Optional[Flashcard], groupID):
         super().__init__(parent)
 
+        screen_height = self.winfo_screenheight()
+        screen_width = self.winfo_screenwidth()
+        
+        width = 640
+        height = 500
+
         self.groupID = groupID
         self.parent = parent
         self.operation = operation
@@ -34,7 +40,7 @@ class PopupWindow(ctk.CTkToplevel):
         if cardInfo is not None:
             self.cardInfo = cardInfo
 
-        self.geometry("640x500+200+60")
+        self.geometry(f"{width}x{height}+{(screen_width - width)//2}+{(screen_height - height)//2}")
         self.resizable(False, False)
 
         self.grid_columnconfigure((0, 1), weight=1)
@@ -67,8 +73,8 @@ class PopupWindow(ctk.CTkToplevel):
         self.btn_back = ctk.CTkButton(self, text="Back", command=self.back)
 
         # Place buttons below the textboxes
-        self.btn_save.grid(column=0, row=2, padx=10, pady=10, sticky="ew")
-        self.btn_back.grid(column=1, row=2, padx=10, pady=10, sticky="ew")
+        self.btn_save.grid(column=1, row=2, padx=10, pady=10, sticky="ew")
+        self.btn_back.grid(column=0, row=2, padx=10, pady=10, sticky="ew")
 
     # Save button
     def save(self):

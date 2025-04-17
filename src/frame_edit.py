@@ -49,7 +49,7 @@ class EditFrame(ctk.CTkFrame):
         self.title_textbox.bind("<Return>", self.update_groupName)  # Bind Enter key to a function
         self.title_textbox.grid(column=2, row=0, padx=10, pady=10, sticky="ew")
 
-        self.insert_card_button = ctk.CTkButton(self.topMenuBar, text='Insert Card', width=button_width, command=self.create_card)
+        self.insert_card_button = ctk.CTkButton(self.topMenuBar, text='Insert New Card', width=button_width, command=self.create_card)
         self.insert_card_button.grid(column=3, row=0)
 
     def update_groupName(self, event=None):

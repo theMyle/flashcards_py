@@ -7,15 +7,18 @@ class App(ctk.CTk):
     def __init__(self, title):
         super().__init__()
 
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
         self.current_window = None
         self.title(title)
         self.padding = 20
         self.height = 720 - 120
         self.width =  1280 - 120
-        self.window_x_pos = 50
-        self.window_y_pos = 60
+        self.window_x_pos = (screen_width - self.width) // 2
+        self.window_y_pos = (screen_height - self.height) // 2
         self.minsize(self.width, self.height)
-        self.geometry(f"{self.width}x{self.height}+{self.window_y_pos}+{self.window_x_pos}")
+        self.geometry(f"{self.width}x{self.height}+{self.window_x_pos}+{self.window_y_pos}")
         self.frame_main = MainFrame(self,self)
 
     # changes content of the current window to a new specified frame

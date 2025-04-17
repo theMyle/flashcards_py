@@ -1,3 +1,4 @@
+import random
 import customtkinter as ctk
 import textwrap
 from database import db
@@ -11,14 +12,19 @@ class ReviewFrame(ctk.CTkFrame):
         self.groupID = groupID
         self.group_info: FlashcardGroup = db.getGroupInfo(self.groupID) # type: ignore
         self.flashcard_group: list[Flashcard] = db.getCards(self.groupID) # type: ignore
+        random.shuffle(self.flashcard_group)
 
         # Review states
         self.card_state = 'front' # front | back
         self.review_state = None # review | mistakes | summary
 
-        self.number_of_cards = len(self.flashcard_group)
+        try:
+            self.number_of_cards = len(self.flashcard_group)
+        except:
+            self.number_of_cards = 0
+
         self.current_card_count = 1
-        self.current_card: Flashcard 
+        self.current_card: Flashcard = None
         self.mistakes_list = []
 
         self.correct = 0
@@ -47,7 +53,7 @@ class ReviewFrame(ctk.CTkFrame):
 
 
     def create_progress_widget(self):
-        review_progress = ctk.CTkLabel(self, text="0/0")
+        review_progress = ctk.CTkLabel(self, text="0/0", font=("mono", 18))
         review_progress.grid(column=0, row=1, padx=0, pady=0)
         return review_progress
 
@@ -157,7 +163,9 @@ class ReviewFrame(ctk.CTkFrame):
                 if len(self.mistakes_list) > 0:
                     self.review_state = 'mistakes'
                     self.flashcard_group = self.mistakes_list
-                    self.review_progress.configure(text="Review Mistakes")
+                    self.current_card_count = 0
+                    self.number_of_cards = len(self.mistakes_list)
+                    self.review_progress.configure(text=f"Reviewing Mistakes {self.current_card_count}/{self.number_of_cards}")
                     self.update_review()
                 else:
                     self.review_state = 'summary'
@@ -184,10 +192,14 @@ class ReviewFrame(ctk.CTkFrame):
             if len(self.flashcard_group) == 0:
                 # will run once then change state
                 self.mistakes += 1
+                self.mistakes_list.append(self.current_card)
+
                 if len(self.mistakes_list) > 0:
                     self.review_state = 'mistakes'
                     self.flashcard_group = self.mistakes_list
-                    self.review_progress.configure(text="Review Mistakes")
+                    self.current_card_count = 0
+                    self.number_of_cards = len(self.mistakes_list)
+                    self.review_progress.configure(text=f"Reviewing Mistakes {self.current_card_count}/{self.number_of_cards}")
                     self.update_review()
                 else:
                     self.review_state = 'summary'
@@ -215,20 +227,24 @@ class ReviewFrame(ctk.CTkFrame):
 
     def update_review(self):
         if self.review_state == 'review':
-            if self.current_card_count < self.number_of_cards:
-                self.current_card_count += 1
-                self.review_progress.configure(text=f"{self.current_card_count}/{self.number_of_cards}")
+            self.current_card_count += 1
+            self.review_progress.configure(text=f"{self.current_card_count}/{self.number_of_cards}")
             self.current_card = self.flashcard_group.pop(0)
             self.middle_widget.configure(text=self.current_card.front)
+            self.card_state = 'front'
             return
 
         if self.review_state == 'mistakes':
+            self.current_card_count += 1
+            self.review_progress.configure(text=f"Reviewing Mistakes {self.current_card_count}/{self.number_of_cards}")
             self.current_card = self.flashcard_group.pop(0)
             self.middle_widget.configure(text=self.current_card.front)
+            self.card_state = 'front'
             return
 
         if self.review_state == 'summary':
-            self.middle_widget.configure(text=f"Review Summary\n\n✅ Correct: {self.correct}\n❌ Mistakes: {self.mistakes}")
+            self.middle_widget.configure(text=f"Review Summary\n\n✅ Correct: {self.correct}\n❎ Mistakes: {self.mistakes}")
             self.bottom_menu_frame.destroy()
+            self.card_state = 'front'
             return
 
