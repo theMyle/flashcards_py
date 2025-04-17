@@ -4,6 +4,7 @@ from typing import List
 from flashcard import FlashcardGroup
 from frame_edit import EditFrame
 from frame_review import ReviewFrame
+from database import db
 
 # Main window for the application
 # The first window to interact with
@@ -11,6 +12,7 @@ class MainFrame(ctk.CTkFrame):
     def __init__(self, master, root):
         super().__init__(master)
 
+        # I prolly should decouple business logic and my UI config!!!
         self.grid_columnconfigure(0, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
         self.grid_rowconfigure(1, weight = 10)
@@ -37,18 +39,27 @@ class MainFrame(ctk.CTkFrame):
         self.menu.create_btn.grid(column=2, row=0)
 
         # Flashcards Group List
-        from test_data import generate_test_data        # REMOVE THIS SHIT! For testing only!
-        self.groupList = FlashcardGroupScrollWidget(self, root, generate_test_data(10))
+        self.groupList = FlashcardGroupScrollWidget(self, root, db.getGroups())
         self.groupList.configure(fg_color="transparent")
         self.groupList.grid(column = 0, row = 1, sticky="nsew")
         self.groupList.load_groups()
 
+
+    # creates a new set, inserts to database and updates the UI too
     def create_new_set(self):
         dialog = ctk.CTkInputDialog(text="Enter Group Name", title="Create New Flashcard Group")
-        text = dialog.get_input()
-        print(f"title: {text}")
-        pass
 
+        groupName = dialog.get_input()
+        if len(groupName) == 0:
+            return
+        else:
+            groupName.strip()
+
+        groupID = db.insertGroup(groupName)
+        self.groupList.insert_group(groupName, groupID)
+
+
+    # No time to implement this shit yet
     def search_event_handler(self, event):
         text = self.menu.search_bar.get("0.0", "end").strip()
 
@@ -64,28 +75,36 @@ class MainFrame(ctk.CTkFrame):
 
 
 # scrollbar widget for flashcard groups
+# a scrollbar container since it is required if I want scrollbar
 class FlashcardGroupScrollWidget(ctk.CTkScrollableFrame):
     def __init__(self, master, root, group_list: List[FlashcardGroup]):
         super().__init__(master)
 
         self.root = root
         self.items = group_list
-        # self.root.after(50, self.load_groups)
 
     def load_groups(self):
-        for group in self.items:
-            item = FlashcardGroupFrame(self, self.root, group)
-            item.pack(fill="x", pady=5, padx=1)
+        if self.items != None:
+            for item in self.items:
+                item = FlashcardGroupFrame(self, self.root, item.title, item.group_id)
+                item.pack(fill="x", pady=5, padx=1)
+
+    def insert_group(self, group_name, group_ID):
+        """Inserts a new group into the UI"""
+        item = FlashcardGroupFrame(self, self.root, group_name, group_ID)
+        item.pack(fill="x", pady=5, padx=1)
 
 
 # Widget for flashcard group holding the buttons, title and others group information
+# The individual groups frame with buttons each
 class FlashcardGroupFrame(ctk.CTkFrame):
-    def __init__(self, master, root, group):
+    def __init__(self, master, root, group_name, group_id):
         super().__init__(master)
 
         # members
         self.root = root
-        self.flashcard_group_info = group
+        self.group_name = group_name
+        self.group_id = group_id
         self.configure(fg_color="#1E1E1E")
 
         # design config
@@ -103,15 +122,17 @@ class FlashcardGroupFrame(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=1)
 
         self.title_label = ctk.CTkLabel(self, font=(self.font_family, self.title_font_size),
-                                        text=self.flashcard_group_info.title,
+                                        text=self.group_name,
                                         text_color="white",
                                         wraplength=500)
         self.title_label.grid(column=2, row=0, padx=20, sticky="w")
+
         self.review_btn = ctk.CTkButton(self, text="Review",
                                         width=self.btn_width, height=self.btn_height,
                                         font=(self.font_family, self.button_font_size),
                                         command=self.review_window)
         self.review_btn.grid(column=0, row=0, padx=(17,0), pady=15, sticky="W")
+
         self.edit_btn = ctk.CTkButton(self, text="Manage",
                                       width=self.btn_width, height=self.btn_height,
                                       font=(self.font_family, self.button_font_size),
@@ -119,6 +140,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                       hover_color="#5A5A5A",
                                       command=self.edit_window)
         self.edit_btn.grid(column=1, row=0, padx=5, sticky="W")
+
         self.delete_btn = ctk.CTkButton(self, text="Delete",
                                         width=self.btn_width,
                                         height=self.btn_height,
@@ -128,17 +150,25 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                         command=self.delete_prompt)
         self.delete_btn.grid(column=3, row=0, padx=(0,10), sticky="E")
 
-    # change current window to review window TODO
+    # I should let all of these function manage the database instead of supplying them 
+    # all the same data for easy refactorting down the line
+
+    # change current window to review window 
     def review_window(self):
-        frame = ReviewFrame(self.root, self.flashcard_group_info)
+        frame = ReviewFrame(self.root, self.group_id)
         self.root.change_frame(frame)
 
-    # change current window to edit window TODO
+    # change current window to edit window 
     def edit_window(self):
-        frame = EditFrame(self.root, self.flashcard_group_info)
+        frame = EditFrame(self.root, self.group_id, self)
         self.root.change_frame(frame)
 
-    # a deletion pop up for confirmation TODO
+    # a deletion pop up for confirmation
     def delete_prompt(self):
-        print("Delete Group")
-        pass
+
+        # Create a prompt here for delete confirmation
+        # TODO!
+
+        db.deleteGroup(self.group_id)
+        self.destroy()
+

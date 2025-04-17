@@ -1,12 +1,12 @@
 import sqlite3
 import sys
 
-from typing import List
-from flashcard import Flashcard
+from typing import List, Optional
+from flashcard import Flashcard, FlashcardGroup
 
 
 class FlashcardDB:
-    """Class for managing flashcard database."""
+    """Class for managing flashcard database"""
     def __init__(self) -> None:
         self.dbName = "flashcards.db"
         self.connection = sqlite3.connect(self.dbName)
@@ -90,7 +90,6 @@ class FlashcardDB:
         self.connection.commit()
         return self.cursor.lastrowid
 
-
     def insertGroup(self, groupName: str) -> int:
         """
         Inserts a new flashcard group into the database.
@@ -104,6 +103,57 @@ class FlashcardDB:
         self.connection.commit()
         return self.cursor.lastrowid
 
+    def getGroups(self) -> List[FlashcardGroup] | None:
+        """
+        Returns flashcard groups from the database.
+        """
+
+        sql = """
+        SELECT * 
+        FROM FlashcardGroups;
+        """
+
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        return [FlashcardGroup(group_id=row[0], group_name=row[1]) for row in result]
+
+    def getGroupInfo(self, groupId: int) -> Optional[FlashcardGroup]:
+        """
+        Returns group info of a specific flashcard group.
+        """
+
+        sql = """
+        SELECT * 
+        FROM FlashcardGroups
+        WHERE groupId = ?;
+        """
+
+        self.cursor.execute(sql, (groupId,))
+        result = self.cursor.fetchone()
+
+        if result:
+            return FlashcardGroup(group_id=result[0], 
+                                  group_name=result[1])
+
+        return None
+
+    def updateGroupInfo(self, groupId: int, newGroupName: str):
+        """
+        Updates the name of a specific flashcard group.
+
+        Args:
+            groupId (int): The ID of the group to update.
+            newGroupName (str): The new name for the group.
+        """
+
+        sql = """
+        UPDATE FlashcardGroups
+        SET groupName = ?
+        WHERE groupId = ?;
+        """
+
+        self.cursor.execute(sql, (newGroupName, groupId))
+        self.connection.commit()
 
     def getCards(self, groupId: int) -> List[Flashcard] | None:
         """Returns all cards inside a group."""
@@ -121,25 +171,25 @@ class FlashcardDB:
         else:
             return None
 
-
     def deleteCard(self, cardId: int):
-        "Delete a specific card."
+        "Deletes a specific card."
         sql = "DELETE FROM Flashcards WHERE cardId = ?;"
         self.cursor.execute(sql, (cardId,))
         self.connection.commit()
 
 
     def deleteGroup(self, groupId: int):
-        "Delete group and all of its child."
+        """Delete group and all of its children"""
         sql = "DELETE FROM FlashcardGroups WHERE groupId = ?;"
         self.cursor.execute(sql, (groupId,))
         self.connection.commit()
 
 
-'''
-1/2 childhood
-1/4 college
-1/3 batcher
-2 2/3 gf
-'''
+    def updateCard(self, cardId: int, newFront: str, newBack: str):
+        """Update a specific card based on cardId"""
+        sql = "UPDATE Flashcards SET cardFront = ?, cardBack = ? WHERE cardId = ?"
+        self.cursor.execute(sql, (newFront, newBack, cardId))
+        self.connection.commit()
 
+
+db:FlashcardDB = FlashcardDB()

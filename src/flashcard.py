@@ -38,11 +38,9 @@ class Flashcard:
 
 # will hold groups of flashcards
 class FlashcardGroup:
-    def __init__(self, group_id: int,group_name: str, description: str, flashcard_list: List[Flashcard]):
+    def __init__(self, group_id: int,group_name: str):
         self.group_id: int = group_id
         self.title: str = group_name
-        self.description: str = description
-        self.items: List[Flashcard] = flashcard_list
 
         """
         self.bucket_0: List[Flashcard] = []
