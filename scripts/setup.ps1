@@ -3,8 +3,6 @@
 if (!(Test-Path -Path ".\venv\")) {
     Write-Host "Creating virtual environment..."
     python -m venv venv
-    Write-Output "*/" > .\venv\.gitignore
-
     Write-Host "Installing python packages..."
     .\venv\Scripts\pip.exe install -r .\requirements.txt > $null
 }
