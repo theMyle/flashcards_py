@@ -1,4 +1,7 @@
 @echo off
 
-powershell unblock-file "./scripts/setup.ps1"
-powershell -ExecutionPolicy Bypass "./scripts/setup.ps1"
+IF NOT EXIST "venv\" (
+  python setup.py
+)
+
+.\venv\Scripts\python.exe src\main.py
