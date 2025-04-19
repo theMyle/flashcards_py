@@ -4,7 +4,7 @@ import platform
 import subprocess
 
 required_python_version = (3, 8)
-venv_dir = "venv"
+venv_dir = "./venv"
 
 check = "✅"
 cross = "❌"
@@ -71,6 +71,9 @@ def main():
     if os.path.isfile("requirements.txt"):
         print("Installing requirements... ", end="", flush=True)
 
+        python_path = ""
+        pip_path = ""
+
         try:
             system = platform.system().lower()
 
@@ -78,23 +81,27 @@ def main():
                 python_path = os.path.join(venv_dir, "Scripts", "python.exe")
                 pip_path = os.path.join(venv_dir, "Scripts", "pip.exe")
 
-                if not os.path.isfile(python_path):
-                    print(f"Something wrong with virtual env, python not found (.\\{python_path} does not exist)")
-                    return
-                if not os.path.isfile(pip_path):
-                    print(f"Something wrong with virtual env, pip not found (.\\{pip_path} does not exist).")
-                    return
-
-                # install requirements.txt
-                subprocess.run(
-                    [pip_path, 'install', '-r', 'requirements.txt'], 
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
-
+            elif system == "linux":
+                python_path = os.path.join(venv_dir, "bin", "python")
+                pip_path = os.path.join(venv_dir, "bin", "pip")
             else:
-                print(f"Script does not support {system} systems, please manually install requirements.txt.")
+                print(f"{cross} - Script does not support {system} systems, please manually install requirements.txt.")
+                return
+
+            if not os.path.isfile(python_path):
+                print(f"{cross} - Something wrong with virtual env, python not found (.\\{python_path} does not exist)")
+                return
+            if not os.path.isfile(pip_path):
+                print(f"{cross} - Something wrong with virtual env, pip not found (.\\{pip_path} does not exist).")
+                return
+
+            # install requirements.txt
+            subprocess.run(
+                [pip_path, 'install', '-r', 'requirements.txt'], 
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
 
             print(check)
         except Exception as e:

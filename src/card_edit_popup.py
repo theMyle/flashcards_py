@@ -7,12 +7,19 @@ def show_error_popup(parent, message):
     """Displays an error popup with the given message."""
     error_popup = ctk.CTkToplevel(parent)
     error_popup.title("Error")
-    error_popup.geometry("300x150")
     error_popup.resizable(False, False)
+
+    sw = error_popup.winfo_screenwidth()
+    sh = error_popup.winfo_screenheight()
+
+    w = error_popup.winfo_width()
+    h = error_popup.winfo_height()
+
+    error_popup.geometry(f"+{(sw - w) // 2}+{(sh-h) // 2}")
 
     # Add a label to display the error message
     error_label = ctk.CTkLabel(error_popup, text=message, font=("Arial", 14), wraplength=280)
-    error_label.pack(pady=20)
+    error_label.pack(pady=20, padx=20)
 
     # Add an OK button to close the popup
     ok_button = ctk.CTkButton(error_popup, text="OK", command=error_popup.destroy)

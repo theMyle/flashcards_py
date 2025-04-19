@@ -5,12 +5,15 @@ from flashcard import FlashcardGroup
 from frame_edit import EditFrame
 from frame_review import ReviewFrame
 from database import db
+from card_edit_popup import show_error_popup
 
 # Main window for the application
 # The first window to interact with
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master, root):
         super().__init__(master)
+
+        self.parent = master
 
         # I prolly should decouple business logic and my UI config!!!
         self.grid_columnconfigure(0, weight = 1)
@@ -57,7 +60,8 @@ class MainFrame(ctk.CTkFrame):
         dialog.geometry(f"+{(sw - w) // 2}+{(sh-h) // 2}")
 
         groupName = dialog.get_input()
-        if groupName == None:
+        if groupName == None or groupName == "":
+            show_error_popup(self, "Group name cannot be empty!")
             return 
         else:
             groupName.strip()
