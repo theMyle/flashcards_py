@@ -146,7 +146,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                         command=self.review_window)
         self.review_btn.grid(column=0, row=0, padx=(17,0), pady=15, sticky="W")
 
-        self.edit_btn = ctk.CTkButton(self, text="Manage",
+        self.edit_btn = ctk.CTkButton(self, text="Manage Cards",
                                       width=self.btn_width, height=self.btn_height,
                                       font=(self.font_family, self.button_font_size),
                                       fg_color="#3A3A3A",
