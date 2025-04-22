@@ -60,9 +60,11 @@ class MainFrame(ctk.CTkFrame):
         dialog.geometry(f"+{(sw - w) // 2}+{(sh-h) // 2}")
 
         groupName = dialog.get_input()
-        if groupName == None or groupName == "":
+        if groupName == "":
             show_error_popup(self, "Group name cannot be empty!")
             return 
+        elif groupName == None:
+            return
         else:
             groupName.strip()
 
