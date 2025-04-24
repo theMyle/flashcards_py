@@ -1,3 +1,4 @@
+
 import random
 import customtkinter as ctk
 import textwrap
@@ -5,7 +6,7 @@ from datetime import datetime, timedelta
 from database import db
 from flashcard import Flashcard, FlashcardGroup
 
-class ReviewFrame(ctk.CTkFrame):
+class ReviewFrameAll(ctk.CTkFrame):
     def __init__(self, master, groupID):
         super().__init__(master)
 
@@ -13,7 +14,6 @@ class ReviewFrame(ctk.CTkFrame):
         self.groupID = groupID
         self.group_info: FlashcardGroup = db.getGroupInfo(self.groupID) # type: ignore
         self.flashcard_group: list[Flashcard] = db.getCards(self.groupID) # type: ignore
-        self.dateToday = datetime.today().date()
 
         # Review states
         self.card_state = 'front' # front | back
@@ -121,22 +121,6 @@ class ReviewFrame(ctk.CTkFrame):
             self.middle_widget.configure(text='No flashcards to review, create some.')
             return
 
-
-        # filter the ones needed to be reviewed today
-        due_cards = []
-
-        for card in self.flashcard_group:
-            if card.last_reviewed.date() != self.dateToday or card.next_review.date() <= self.dateToday:
-                    due_cards.append(card)
-
-        self.flashcard_group = due_cards
-        self.number_of_cards = len(due_cards)
-
-        if len(self.flashcard_group) == 0:
-            latestCard = db.getClosestReviewDate()
-            self.middle_widget.configure(text=f'No flashcards to review today, come back on \n\n{latestCard.strftime("%A, %b, %d")}')
-            return
-
         random.shuffle(self.flashcard_group)
 
         for card in self.flashcard_group:
@@ -177,9 +161,7 @@ class ReviewFrame(ctk.CTkFrame):
 
             # when there are no cards left
             if len(self.flashcard_group) == 0:
-                # will run once then change state
-                # update review interval
-                self.update_review_interval_correct()
+                self.correct += 1
 
                 if len(self.mistakes_list) > 0:
                     self.review_state = 'mistakes'
@@ -194,7 +176,7 @@ class ReviewFrame(ctk.CTkFrame):
                     self.update_review()
                 return
 
-            self.update_review_interval_correct()
+            self.correct += 1
             self.update_review()
 
         # review the mistakes
@@ -211,7 +193,8 @@ class ReviewFrame(ctk.CTkFrame):
 
             # when there are no cards left
             if len(self.flashcard_group) == 0:
-                self.update_review_interval_wrong()
+                self.mistakes += 1
+                self.mistakes_list.append(self.current_card)
 
                 if len(self.mistakes_list) > 0:
                     self.review_state = 'mistakes'
@@ -226,7 +209,8 @@ class ReviewFrame(ctk.CTkFrame):
                     self.update_review()
                 return
 
-            self.update_review_interval_wrong()
+            self.mistakes += 1
+            self.mistakes_list.append(self.current_card)
             self.update_review()
 
         # review the mistakes

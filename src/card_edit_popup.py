@@ -88,8 +88,8 @@ class PopupWindow(ctk.CTkToplevel):
     def save(self):
         today = datetime.today().date()
 
-        new_front = self.card_front.get("1.0", "end-1c")
-        new_back = self.card_back.get("1.0", "end-1c")
+        new_front = self.card_front.get("1.0", "end-1c").strip()
+        new_back = self.card_back.get("1.0", "end-1c").strip()
 
         # Add check here, front or back must not be empty
         if not new_front or not new_back:

@@ -4,6 +4,7 @@ from typing import List
 from flashcard import FlashcardGroup
 from frame_edit import EditFrame
 from frame_review import ReviewFrame
+from frame_review_all import ReviewFrameAll
 from database import db
 from card_edit_popup import show_error_popup
 
@@ -130,21 +131,30 @@ class FlashcardGroupFrame(ctk.CTkFrame):
         # layout config
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(2, weight=50)
-        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(3, weight=40)
+        self.grid_columnconfigure(4, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         self.title_label = ctk.CTkLabel(self, font=(self.font_family, self.title_font_size),
                                         text=self.group_name,
                                         text_color="white",
                                         wraplength=500)
-        self.title_label.grid(column=2, row=0, padx=20, sticky="w")
+        self.title_label.grid(column=3, row=0, padx=20, sticky="w")
 
-        self.review_btn = ctk.CTkButton(self, text="Review",
+        self.review_btn = ctk.CTkButton(self, text="Daily\nReview",
                                         width=self.btn_width, height=self.btn_height,
                                         font=(self.font_family, self.button_font_size),
                                         command=self.review_window)
         self.review_btn.grid(column=0, row=0, padx=(17,0), pady=15, sticky="W")
+
+
+        self.review_btn = ctk.CTkButton(self, text="Review\n(All)",
+                                        width=self.btn_width, height=self.btn_height,
+                                        font=(self.font_family, self.button_font_size),
+                                        command=self.review_window_all)
+        self.review_btn.grid(column=1, row=0, padx=(17,0), pady=15, sticky="W")
+
 
         self.edit_btn = ctk.CTkButton(self, text="Manage Cards",
                                       width=self.btn_width, height=self.btn_height,
@@ -152,7 +162,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                       fg_color="#3A3A3A",
                                       hover_color="#5A5A5A",
                                       command=self.edit_window)
-        self.edit_btn.grid(column=1, row=0, padx=5, sticky="W")
+        self.edit_btn.grid(column=2, row=0, padx=5, sticky="W")
 
         self.delete_btn = ctk.CTkButton(self, text="Delete",
                                         width=self.btn_width,
@@ -161,7 +171,7 @@ class FlashcardGroupFrame(ctk.CTkFrame):
                                         fg_color="#424242",
                                         hover_color="#D32F2F",
                                         command=self.delete_prompt)
-        self.delete_btn.grid(column=3, row=0, padx=(0,10), sticky="E")
+        self.delete_btn.grid(column=4, row=0, padx=(0,10), sticky="E")
 
     # I should let all of these function manage the database instead of supplying them 
     # all the same data for easy refactorting down the line
@@ -174,6 +184,10 @@ class FlashcardGroupFrame(ctk.CTkFrame):
     # change current window to edit window 
     def edit_window(self):
         frame = EditFrame(self.root, self.group_id, self)
+        self.root.change_frame(frame)
+
+    def review_window_all(self):
+        frame = ReviewFrameAll(self.root, self.group_id)
         self.root.change_frame(frame)
 
     # a deletion pop up for confirmation
