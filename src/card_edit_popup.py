@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 import customtkinter as ctk
 from flashcard import Flashcard
@@ -85,8 +86,10 @@ class PopupWindow(ctk.CTkToplevel):
 
     # Save button
     def save(self):
-        new_front = self.card_front.get("1.0", "end-1c")
-        new_back = self.card_back.get("1.0", "end-1c")
+        today = datetime.today().date()
+
+        new_front = self.card_front.get("1.0", "end-1c").strip()
+        new_back = self.card_back.get("1.0", "end-1c").strip()
 
         # Add check here, front or back must not be empty
         if not new_front or not new_back:
@@ -94,7 +97,7 @@ class PopupWindow(ctk.CTkToplevel):
             return
 
         if self.operation == 'create':
-            card = Flashcard(self.groupID, new_front, new_back)
+            card = Flashcard(self.groupID, new_front, new_back, today - timedelta(days=1), today, 1)
             db.insertCard(self.groupID, new_front, new_back)
             self.parent.col2.add_card(card)
 
@@ -103,7 +106,7 @@ class PopupWindow(ctk.CTkToplevel):
             self.card_back.delete("0.0", "end")
 
         elif self.operation == 'edit':
-            card = Flashcard(self.cardInfo.id, new_front, new_back)
+            card = Flashcard(self.groupID, new_front, new_back, self.cardInfo.last_reviewed, self.cardInfo.next_review, self.cardInfo.interval)
             db.updateCard(card.id, card.front, card.back)
             self.parent.update_card_info(card)
 

@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+from datetime import datetime, timedelta
 
 from typing import List, Optional
 from flashcard import Flashcard, FlashcardGroup
@@ -29,6 +30,9 @@ class FlashcardDB:
             cardFront TEXT NOT NULL,
             cardBack TEXT NOT NULL,
             groupId INTEGER,
+            lastReview TEXT,
+            nextReview TEXT,
+            interval INTEGER DEFAULT 1,
 
             FOREIGN KEY (groupId) 
                 REFERENCES FlashcardGroups(groupId) 
@@ -85,8 +89,9 @@ class FlashcardDB:
             int: The ID of the newly created card.
         """
 
-        sql = """INSERT INTO Flashcards (cardFront, cardBack, groupId) Values (?,?,?);"""
-        self.cursor.execute(sql,(front, back, groupId))
+        today = (datetime.now().date() - timedelta(days=1)).isoformat() # Set lastReview to yesterday
+        sql = """INSERT INTO Flashcards (cardFront, cardBack, groupId, lastReview, nextReview, interval) Values (?,?,?,?,?,?);"""
+        self.cursor.execute(sql,(front, back, groupId, today, today, 1))
         self.connection.commit()
         return self.cursor.lastrowid
 
@@ -159,7 +164,7 @@ class FlashcardDB:
         """Returns all cards inside a group."""
 
         sql = """
-        SELECT cardId, cardFront, cardBack
+        SELECT cardId, cardFront, cardBack, lastReview, nextReview, interval
         FROM Flashcards
         WHERE groupId = ?;
         """
@@ -167,7 +172,12 @@ class FlashcardDB:
         result = self.cursor.fetchall()
 
         if result:
-            return [Flashcard(row[0], row[1], row[2]) for row in result]
+            return [Flashcard(row[0], 
+                              row[1], 
+                              row[2], 
+                              datetime.fromisoformat(row[3]), 
+                              datetime.fromisoformat(row[4]), 
+                              row[5]) for row in result]
         else:
             return None
 
@@ -187,9 +197,31 @@ class FlashcardDB:
 
     def updateCard(self, cardId: int, newFront: str, newBack: str):
         """Update a specific card based on cardId"""
-        sql = "UPDATE Flashcards SET cardFront = ?, cardBack = ? WHERE cardId = ?"
+        sql = "UPDATE Flashcards SET cardFront=?, cardBack=? WHERE cardId = ?"
         self.cursor.execute(sql, (newFront, newBack, cardId))
         self.connection.commit()
 
+
+    def updateCardReview(self, cardId: int, lastReview: datetime, nextReview: datetime, interval: int):
+        """FOR REVIEW EDITS: Update a specific card based on cardId"""
+        sql = "UPDATE Flashcards SET lastReview=?, nextReview=?, interval=? WHERE cardId = ?"
+        self.cursor.execute(sql, (lastReview.isoformat(), nextReview.isoformat(), interval, cardId))
+        self.connection.commit()
+
+    def getClosestReviewDate(self):
+        sql = """
+            SELECT nextReview 
+            FROM Flashcards
+            WHERE nextReview IS NOT NULL
+            ORDER BY date(nextReview) ASC
+            LIMIT 1;
+            """
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+
+        if result:
+            return datetime.fromisoformat(result[0])
+        else:
+            return None
 
 db:FlashcardDB = FlashcardDB()

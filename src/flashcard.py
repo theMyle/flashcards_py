@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 # STRUCTURE OF FLASHCARDS
@@ -7,12 +8,14 @@ from typing import List
 # bucket    - different buckets have different intervals of showing when reviewing cards (0,1,2)
 # buffer    - will dictate whether to move up or down a bucket
 class Flashcard:
-    def __init__(self, id: int, front: str, back: str):
+    def __init__(self, id: int, front: str, back: str, last_reviewed, next_review, interval):
         self.__id: int = id
         self.__front: str = front
         self.__back: str = back
-        # self.bucket: int = bucket
-        # self.buffer_count: int = buffer_count
+
+        self.last_reviewed: datetime = last_reviewed
+        self.next_review: datetime = next_review
+        self.interval: int = interval
 
     def __repr__(self):
         return f"(id={self.__id}, front={self.__front}, back={self.__back})"
