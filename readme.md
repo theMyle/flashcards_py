@@ -31,9 +31,20 @@ A desktop flashcard app built with Python to help with efficient learning using 
 
 ### 1. Environment Setup
 
+cd into the flashcards_py directory:
+
+```bash
+cd .\flascards_py
+```
+
 Use the `setup.py` script to automatically:
 - Create a virtual environment
 - Install required dependencies
 
 ```bash
 python setup.py
+```
+
+### 2. Run
+
+Run using the `runner.bat` or `runner.sh`
