@@ -26,3 +26,14 @@ A desktop flashcard app built with Python to help with efficient learning using 
 - **Concepts:** Spaced Repetition, CRUD operations, Local Storage
 
 ---
+
+## ⚙️ Setup & Usage
+
+### 1. Environment Setup
+
+Use the `setup.py` script to automatically:
+- Create a virtual environment
+- Install required dependencies
+
+```bash
+python setup.py
