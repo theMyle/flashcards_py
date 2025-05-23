@@ -107,7 +107,7 @@ class PopupWindow(ctk.CTkToplevel):
 
         elif self.operation == 'edit':
             card = Flashcard(self.groupID, new_front, new_back, self.cardInfo.last_reviewed, self.cardInfo.next_review, self.cardInfo.interval)
-            db.updateCard(card.id, card.front, card.back)
+            db.updateCard(self.cardInfo.id, new_front, new_back)
             self.parent.update_card_info(card)
 
         self.destroy()
